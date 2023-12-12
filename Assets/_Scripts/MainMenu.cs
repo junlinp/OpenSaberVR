@@ -26,12 +26,13 @@ public class MainMenu : MonoBehaviour
 
     private void Awake()
     {
-        Songsettings = GameObject.FindGameObjectWithTag("SongSettings").GetComponent<SongSettings>();
-        SceneHandling = GameObject.FindGameObjectWithTag("SceneHandling").GetComponent<SceneHandling>();
+        Songsettings = SongSettings.Instance;
+        SceneHandling = SceneHandling.Instance;
     }
 
     public void ShowSongs()
     {
+        SongInfos.AddSong();
         if (SongInfos.AllSongs.Count == 0)
         {
             Title.gameObject.SetActive(false);
@@ -39,7 +40,9 @@ public class MainMenu : MonoBehaviour
             return;
         }
 
-        Songsettings.CurrentSong = SongInfos.AllSongs[SongInfos.CurrentSong];
+        Debug.LogFormat("Songsettings is null {0}" , Songsettings == null);
+        Debug.LogFormat("CurrentSong is null {0}" , Songsettings.CurrentSong == null);
+        Songsettings.CurrentSong = SongInfos.AllSongs[Songsettings.CurrentSongIndex];
 
         Title.gameObject.SetActive(false);
         PanelAreYouSure.gameObject.SetActive(false);
@@ -208,6 +211,7 @@ public class MainMenu : MonoBehaviour
 
     private IEnumerator LoadSongScene()
     {
+        Debug.LogFormat("SceneHandling is null ? {0}", SceneHandling == null );
         yield return SceneHandling.LoadScene("OpenSaber", LoadSceneMode.Additive);
         yield return SceneHandling.UnloadScene("Menu");
     }

@@ -10,7 +10,10 @@ public class SongFolderText : MonoBehaviour
     void Start()
     {
         string path = Path.Combine(Application.persistentDataPath + "/Playlists");
-        GetComponent<Text>().text="No song files found, please make sure that the files are located in the '"+path+"' folder.";
+        bool exists = Directory.Exists(path);
+        var list = Directory.GetDirectories(path);
+        var lengths = Directory.GetFiles(list[0], "Info.dat").Length;
+        GetComponent<Text>().text="No song files found, please make sure that the files are located in the '"+path+"' folder." + exists + list.Length + " info length" + lengths;
     }
 
     // Update is called once per frame

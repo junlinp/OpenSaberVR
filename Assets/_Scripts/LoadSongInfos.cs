@@ -28,19 +28,22 @@ public class LoadSongInfos : MonoBehaviour
 
     private void Awake()
     {
-        Songsettings = GameObject.FindGameObjectWithTag("SongSettings").GetComponent<SongSettings>();
+        Songsettings = SongSettings.Instance;
     }
 
-    private void OnEnable()
+    public void OnEnable()
     {
+        AddSong();
+    }
+    public void AddSong() {
         string path = Path.Combine(Application.persistentDataPath + "/Playlists");
         if (Directory.Exists(path))
         {
             foreach (var dir in Directory.GetDirectories(path))
             {
-                if (Directory.Exists(dir) && Directory.GetFiles(dir, "info.dat").Length > 0)
+                if (Directory.Exists(dir) && Directory.GetFiles(dir, "Info.dat").Length > 0)
                 {
-                    JSONObject infoFile = JSONObject.Parse(File.ReadAllText(Path.Combine(dir, "info.dat")));
+                    JSONObject infoFile = JSONObject.Parse(File.ReadAllText(Path.Combine(dir, "Info.dat")));
 
                     var song = new Song();
                     song.Path = dir;
@@ -63,6 +66,8 @@ public class LoadSongInfos : MonoBehaviour
                     AllSongs.Add(song);
                 }
             }
+        } else {
+            Debug.LogFormat("{0} don't exists", path);
         }
     }
 

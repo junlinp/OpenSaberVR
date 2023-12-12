@@ -48,14 +48,15 @@ public class NotesSpawner : MonoBehaviour
 
     void Start()
     {
-        Songsettings = GameObject.FindGameObjectWithTag("SongSettings").GetComponent<SongSettings>();
-        SceneHandling = GameObject.FindGameObjectWithTag("SceneHandling").GetComponent<SceneHandling>();
+        Songsettings = SongSettings.Instance;
+        SceneHandling = SceneHandling.Instance;
+
         string path = Songsettings.CurrentSong.Path;
         if (Directory.Exists(path))
         {
-            if (Directory.GetFiles(path, "info.dat").Length > 0)
+            if (Directory.GetFiles(path, "Info.dat").Length > 0)
             {
-                JSONObject infoFile = JSONObject.Parse(File.ReadAllText(Path.Combine(path, "info.dat")));
+                JSONObject infoFile = JSONObject.Parse(File.ReadAllText(Path.Combine(path, "Info.dat")));
 
                 var difficultyBeatmapSets = infoFile.GetArray("_difficultyBeatmapSets");
                 foreach (var beatmapSets in difficultyBeatmapSets)

@@ -17,6 +17,33 @@ public class SceneHandling : MonoBehaviour
     GameObject RightModel;
 
    
+    public static SceneHandling instance_;
+
+    public static SceneHandling Instance {
+        get {
+            if (instance_ == null)
+            {
+                // If the instance is null, find it in the scene or create a new GameObject
+                instance_ = FindObjectOfType<SceneHandling >();
+
+                if (instance_ == null)
+                {
+                    // If still null, create a new GameObject and attach the singleton script
+                    GameObject singletonObject = new GameObject("SceneHandling ");
+                    instance_ = singletonObject.AddComponent<SceneHandling >();
+                }
+            }
+            return instance_;}
+        private set{ instance_ = value;}
+         }
+    private void Awake() {
+        if (Instance != null && Instance != this) {
+            Destroy(this);
+        } else {
+            Instance = this;
+        }
+    }
+
     void EnsureControllers()
     {
         LeftController = GameObject.FindWithTag("LeftController");
