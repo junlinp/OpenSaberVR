@@ -41,17 +41,26 @@ public class NotesSpawner : MonoBehaviour
 
     private AudioSource audioSource;
 
-    private SongSettings Songsettings;
+    private SongSettings songSettings;
     private SceneHandling SceneHandling;
     private bool menuLoadInProgress = false;
     private bool audioLoaded = false;
 
     void Start()
     {
-        Songsettings = SongSettings.Instance;
-        SceneHandling = SceneHandling.Instance;
+         //songSettings= SongSettings.Instance;
+        //SceneHandling = SceneHandling.Instance;
 
-        string path = Songsettings.CurrentSong.Path;
+    }
+    private void Awake()
+    {
+        songSettings = SongSettings.Instance;
+        SceneHandling = SceneHandling.Instance;
+    }
+    public void OnEnable() {
+        Debug.LogFormat("Songsettings is null {0}",  songSettings== null);
+        Debug.LogFormat("Songsettings.CurrentSong is null {0}", songSettings.CurrentSong == null);
+        string path = songSettings.CurrentSong.Path;
         if (Directory.Exists(path))
         {
             if (Directory.GetFiles(path, "Info.dat").Length > 0)
@@ -63,7 +72,7 @@ public class NotesSpawner : MonoBehaviour
                 {
                     foreach (var difficultyBeatmaps in beatmapSets.Obj.GetArray("_difficultyBeatmaps"))
                     {
-                        if (difficultyBeatmaps.Obj.GetString("_difficulty") == Songsettings.CurrentSong.SelectedDifficulty)
+                        if (difficultyBeatmaps.Obj.GetString("_difficulty") == songSettings.CurrentSong.SelectedDifficulty)
                         {
                             audioFilePath = Path.Combine(path, infoFile.GetString("_songFilename"));
                             jsonString = File.ReadAllText(Path.Combine(path, difficultyBeatmaps.Obj.GetString("_beatmapFilename")));
@@ -80,7 +89,7 @@ public class NotesSpawner : MonoBehaviour
 
         JSONObject json = JSONObject.Parse(jsonString);
 
-        var bpm = Convert.ToDouble(Songsettings.CurrentSong.BPM);
+        var bpm = Convert.ToDouble( songSettings.CurrentSong.BPM);
 
         //Notes
         var notes = json.GetArray("_notes");
@@ -122,11 +131,11 @@ public class NotesSpawner : MonoBehaviour
 
     private IEnumerator LoadAudio()
     {
-        var downloadHandler = new DownloadHandlerAudioClip(Songsettings.CurrentSong.AudioFilePath, AudioType.OGGVORBIS);
+        var downloadHandler = new DownloadHandlerAudioClip( songSettings.CurrentSong.AudioFilePath, AudioType.OGGVORBIS);
         downloadHandler.compressed = false;
         downloadHandler.streamAudio = true;
         var uwr = new UnityWebRequest(
-                Songsettings.CurrentSong.AudioFilePath,
+                 songSettings.CurrentSong.AudioFilePath,
                 UnityWebRequest.kHttpVerbGET,
                 downloadHandler,
                 null);

@@ -40,8 +40,6 @@ public class MainMenu : MonoBehaviour
             return;
         }
 
-        Debug.LogFormat("Songsettings is null {0}" , Songsettings == null);
-        Debug.LogFormat("CurrentSong is null {0}" , Songsettings.CurrentSong == null);
         Songsettings.CurrentSong = SongInfos.AllSongs[Songsettings.CurrentSongIndex];
 
         Title.gameObject.SetActive(false);
