@@ -18,9 +18,13 @@ EditorBuildSettings:
     path: Assets/_Scenes/OpenSaber.unity
     guid: 37aa8d289046f3a48bb02b36f3113d87
   m_configObjects:
+    Unity.XR.PXR.Settings: {fileID: 11400000, guid: 56f2108142a1f6eb79b54a0209ce9d89,
+      type: 2}
     com.htc.upm.wave.xrsdk.xrsettings: {fileID: 11400000, guid: a90c8391c61ae6e4aa9527694c4bc0c7,
       type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: f3fc3161d4e6e8b458d85f69b5a6fa3b,
       type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 8a58f80864da77344aa465bc703bda25,
+      type: 2}
+    xr.sdk.mock-hmd.settings: {fileID: 11400000, guid: 9a0a3fdfca2cf77418e8a9008ca0f5bd,
       type: 2}
