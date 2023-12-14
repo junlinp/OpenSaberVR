@@ -19,17 +19,19 @@ class RotationEvent {
 
 
 class Difficulty {
-    static public List<ColorNote> ParseJson(string path) {
+        static public List<ColorNote> ParseJson(string path)
+        {
 
-        JSONObject json = JSONObject.Parse( File.ReadAllText(path));
-        string version = json.GetString("version");
-        if (version[0] == '2') {
-            return ParseJsonV2(path);
-        } else if (version[0] == '3') {
+            JSONObject json = JSONObject.Parse(File.ReadAllText(path));
+            if (json.ContainsKey("version")) {
             return ParseJsonV3(path);
+            }
+            else if (json.ContainsKey("_version"))
+            {
+                return ParseJsonV2(path);
+            }
+            return null;
         }
-        return null;
-    }
 
     static private List<ColorNote> ParseJsonV2(string path) {
         List<ColorNote> list= new List<ColorNote>();
