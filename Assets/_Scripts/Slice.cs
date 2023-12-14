@@ -7,7 +7,7 @@ public class Slice : MonoBehaviour
 
     private void Start()
     {
-        mat = mat = GetComponent<Renderer>().material;
+        mat = GetComponent<Renderer>().material;
     }
 
     public GameObject[] SliceObject(GameObject obj, Material crossSectionMaterial = null)
@@ -22,6 +22,5 @@ public class Slice : MonoBehaviour
         cuttingPlane.Compute(transform);
         cuttingPlane.OnDebugDraw();
     }
-
 #endif
 }

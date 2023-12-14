@@ -233,7 +233,6 @@ StartCoroutine(LoadMenu());
     IEnumerator LoadMenu()
     {
         yield return new WaitForSeconds(5);
-
         yield return SceneHandling.LoadScene("Menu", LoadSceneMode.Additive);
         yield return SceneHandling.UnloadScene("OpenSaber");
     }
