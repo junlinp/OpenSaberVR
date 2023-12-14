@@ -17,6 +17,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using dm;
 
 public class NotesSpawner : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class NotesSpawner : MonoBehaviour
 
     private string jsonString;
     private string audioFilePath;
-    private List<Note> NotesToSpawn = new List<Note>();
+    private List<ColorNote> NotesToSpawn = new List<ColorNote>();
     private List<Obstacle> ObstaclesToSpawn = new List<Obstacle>();
     private double BeatsPerMinute;
 
@@ -61,12 +62,14 @@ public class NotesSpawner : MonoBehaviour
         Debug.LogFormat("Songsettings is null {0}",  songSettings== null);
         Debug.LogFormat("Songsettings.CurrentSong is null {0}", songSettings.CurrentSong == null);
         string path = songSettings.CurrentSong.Path;
+        string version = ""; 
+        string difficulty_path = "";
         if (Directory.Exists(path))
         {
             if (Directory.GetFiles(path, "Info.dat").Length > 0)
             {
                 JSONObject infoFile = JSONObject.Parse(File.ReadAllText(Path.Combine(path, "Info.dat")));
-
+                version = infoFile.GetString("_version");
                 var difficultyBeatmapSets = infoFile.GetArray("_difficultyBeatmapSets");
                 foreach (var beatmapSets in difficultyBeatmapSets)
                 {
@@ -75,6 +78,7 @@ public class NotesSpawner : MonoBehaviour
                         if (difficultyBeatmaps.Obj.GetString("_difficulty") == songSettings.CurrentSong.SelectedDifficulty)
                         {
                             audioFilePath = Path.Combine(path, infoFile.GetString("_songFilename"));
+                            difficulty_path = Path.Combine(path, difficultyBeatmaps.Obj.GetString("_beatmapFilename"));
                             jsonString = File.ReadAllText(Path.Combine(path, difficultyBeatmaps.Obj.GetString("_beatmapFilename")));
                             break;
                         }
@@ -92,6 +96,7 @@ public class NotesSpawner : MonoBehaviour
         var bpm = Convert.ToDouble( songSettings.CurrentSong.BPM);
 
         //Notes
+        /*
         var notes = json.GetArray("_notes");
         foreach (var note in notes)
         {
@@ -107,6 +112,8 @@ public class NotesSpawner : MonoBehaviour
 
             NotesToSpawn.Add(n);
         }
+        */
+        NotesToSpawn = Difficulty.ParseJson(difficulty_path);
 
         //Obstacles
         //var obstacles = json.GetArray("_obstacles");
@@ -177,13 +184,19 @@ StartCoroutine(LoadMenu());
 
         double msPerBeat = 1000 * 60 / BeatsPerMinute;
 
-        //Notes
+        // Notes
+        // TODO(junlinp): using a queue to process
+        //
         for (int i = 0; i < NotesToSpawn.Count; ++i)
         {
-            var noteTime = NotesToSpawn[i].Time * msPerBeat;
+            var noteTime = NotesToSpawn[i].TimeInBeat * msPerBeat;
             if (noteTime > prevBeatsTime && noteTime <= BeatsTime)
             {
-                NotesToSpawn[i].Time = noteTime;
+                //
+                // FIXME(junlinp): it's necessary?
+                //NotesToSpawn[i].Time = noteTime;
+                //
+                //
                 GenerateNote(NotesToSpawn[i]);
             }
         }
@@ -225,10 +238,10 @@ StartCoroutine(LoadMenu());
         yield return SceneHandling.UnloadScene("OpenSaber");
     }
 
-    void GenerateNote(Note note)
+    void GenerateNote(ColorNote note)
     {
-        int point = 0;
-
+        int point = note.yLayer * 4 + note.xColumn;
+        /*
         switch (note.LineLayer)
         {
             case 0:
@@ -243,24 +256,27 @@ StartCoroutine(LoadMenu());
             default:
                 break;
         }
+        */
 
-        if (note.CutDirection == CutDirection.NONDIRECTION)
+        int offset = 0;
+        if (note.CutDirection == CutDirection.ANY)
         {
             // the nondirection cubes are stored at the index+2 in the array
-            note.Hand += 2;
+            offset = 2;
         }
 
-        GameObject cube = Instantiate(Cubes[(int)note.Hand], SpawnPoints[point]);
+        GameObject cube = Instantiate(Cubes[(int)note.NoteColorType + offset], SpawnPoints[point]);
+
         cube.transform.localPosition = Vector3.zero;
 
         float rotation = 0f;
 
         switch (note.CutDirection)
         {
-            case CutDirection.TOP:
+            case CutDirection.UP:
                 rotation = 0f;
                 break;
-            case CutDirection.BOTTOM:
+            case CutDirection.DOWN:
                 rotation = 180f;
                 break;
             case CutDirection.LEFT:
@@ -269,19 +285,19 @@ StartCoroutine(LoadMenu());
             case CutDirection.RIGHT:
                 rotation = 90f;
                 break;
-            case CutDirection.TOPLEFT:
+            case CutDirection.UPLEFT:
                 rotation = 315f;
                 break;
-            case CutDirection.TOPRIGHT:
+            case CutDirection.UPRIGHT:
                 rotation = 45f;
                 break;
-            case CutDirection.BOTTOMLEFT:
+            case CutDirection.DOWNLEFT:
                 rotation = 225f;
                 break;
-            case CutDirection.BOTTOMRIGHT:
+            case CutDirection.DOWNRIGHT:
                 rotation = 125f;
                 break;
-            case CutDirection.NONDIRECTION:
+            case CutDirection.ANY:
                 rotation = 0f;
                 break;
             default:
@@ -314,7 +330,7 @@ StartCoroutine(LoadMenu());
 
         //wall.transform.localScale = new Vector3((float)wallHandling.Width, wall.transform.localScale.y, wall.transform.localScale.z);
     }
-
+    /*
     public class Note
     {
         public double Time { get; set; }
@@ -361,6 +377,7 @@ StartCoroutine(LoadMenu());
         NONDIRECTION = 8
     }
 
+    */
     public class Obstacle
     {
         internal double TimeInSeconds;
