@@ -64,6 +64,7 @@ public class NotesSpawner : MonoBehaviour
         string path = songSettings.CurrentSong.Path;
         string version = ""; 
         string difficulty_path = "";
+        bool LoadPathSuccess = false;
         if (Directory.Exists(path))
         {
             if (Directory.GetFiles(path, "Info.dat").Length > 0)
@@ -80,6 +81,7 @@ public class NotesSpawner : MonoBehaviour
                             audioFilePath = Path.Combine(path, infoFile.GetString("_songFilename"));
                             difficulty_path = Path.Combine(path, difficultyBeatmaps.Obj.GetString("_beatmapFilename"));
                             jsonString = File.ReadAllText(Path.Combine(path, difficultyBeatmaps.Obj.GetString("_beatmapFilename")));
+                            LoadPathSuccess = true;
                             break;
                         }
                     }
@@ -88,7 +90,7 @@ public class NotesSpawner : MonoBehaviour
         }
 
         audioSource = GetComponent<AudioSource>();
-
+        Debug.LogFormat("Load Path Success {0}", LoadPathSuccess);
         StartCoroutine("LoadAudio");
 
         JSONObject json = JSONObject.Parse(jsonString);
@@ -114,7 +116,7 @@ public class NotesSpawner : MonoBehaviour
         }
         */
         NotesToSpawn = Difficulty.ParseJson(difficulty_path);
-
+        Debug.LogFormat("Load {0} Notes", NotesToSpawn.Count);
         //Obstacles
         //var obstacles = json.GetArray("_obstacles");
         //foreach (var obstacle in obstacles)
