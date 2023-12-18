@@ -28,10 +28,16 @@ public class MainMenu : MonoBehaviour
     {
         Songsettings = SongSettings.Instance;
         SceneHandling = SceneHandling.Instance;
+        
+    }
+    public void Start()
+    {
+        ShowSongs();
     }
 
     public void ShowSongs()
     {
+        Debug.Log("Click ShowSongs()");
         SongInfos.AddSong();
         if (SongInfos.AllSongs.Count == 0)
         {
@@ -63,6 +69,8 @@ public class MainMenu : MonoBehaviour
         }
 
         StartCoroutine(PreviewSong(Songsettings.CurrentSong.AudioFilePath));
+        Debug.Log("LoadSong");
+        LoadSong();
     }
 
     public IEnumerator PreviewSong(string audioFilePath)
@@ -88,6 +96,7 @@ public class MainMenu : MonoBehaviour
             yield return null;
 
         PreviewAudioClip = DownloadHandlerAudioClip.GetContent(uwr);
+        
     }
 
     private void FixedUpdate()
@@ -146,6 +155,7 @@ public class MainMenu : MonoBehaviour
 
     public void LoadSong()
     {
+        Debug.Log("LoadSong");
         SongPreview.Stop();
         var song = SongInfos.GetCurrentSong();
         if(song.Difficulties.Count > 1)
@@ -199,7 +209,9 @@ public class MainMenu : MonoBehaviour
                     break;
                 default:
                     break;
+                  
             }
+            StartSceneWithDifficulty(song.Difficulties[1]);
         }
         else
         {
