@@ -22,7 +22,7 @@ public class Saber : MonoBehaviour
     {
         for (int i = 0; i < SaberMeshes.Length; i++)
         {
-            SaberMeshes[i].SetActive(x);
+            //SaberMeshes[i].SetActive(x);
         }
     }
     private void Start()

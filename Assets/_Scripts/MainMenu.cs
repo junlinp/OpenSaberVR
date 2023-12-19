@@ -229,7 +229,7 @@ public class MainMenu : MonoBehaviour
     {
         Debug.LogFormat("SceneHandling is null ? {0}", SceneHandling == null );
         yield return SceneHandling.LoadScene("OpenSaber", LoadSceneMode.Additive);
-        //yield return SceneHandling.UnloadScene("Menu");
+        yield return SceneHandling.UnloadScene("Menu");
     }
 
     public void AreYouSure()
