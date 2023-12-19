@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SkyBox
+  m_Name: Skybox
   m_Shader: {fileID: -6465566751694194690, guid: 125591c4e8879fdc79a7257a20604e13,
     type: 3}
   m_Parent: {fileID: 0}
@@ -26,15 +26,29 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
+    - _AuroraBlend: 2
+    - _AuroraPower: 0.54
     - _BUILTIN_QueueControl: 0
     - _BUILTIN_QueueOffset: 0
+    - _DistortionSpeed: 1
+    - _GradientOffset: 0
     - _HorizonBlend: 30
+    - _Intensity: 1.15
     - _NadirBlend: 1
-    - _ZenithBlend: 1
+    - _NoiseScale: 0.74
+    - _StarHeight: 334.8
+    - _StarPower: 90.11
+    - _StartIntensity: 30
+    - _TwirlStrength: 1.43
+    - _ZenithBlend: 2.3
     m_Colors:
-    - _GroundColor: {r: 0.18295687, g: 0.03458717, b: 0.03458717, a: 0}
-    - _HorizonColor: {r: 0.4716981, g: 0.46947306, b: 0.46947306, a: 0}
-    - _SkyColor: {r: 0.24457997, g: 0.27723056, b: 0.7878064, a: 0}
+    - _DistortionMinMax: {r: 10, g: 12, b: 0, a: 0}
+    - _GroundColor: {r: 0.1837452, g: 0.0228523, b: 0.0228523, a: 0}
+    - _HorizonColor: {r: 0.34446114, g: 0.34218538, b: 0.34218538, a: 0}
+    - _ScrollSpeed: {r: 1, g: 1, b: 0, a: 0}
+    - _SkyColor: {r: 0.18012589, g: 0.22008368, b: 0.797251, a: 0}
+    - _Tiling: {r: 1, g: 1, b: 0, a: 0}
+    - _TwirlOffset: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &6605083321262314349
 MonoBehaviour:

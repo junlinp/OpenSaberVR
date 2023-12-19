@@ -32,7 +32,7 @@ public class MainMenu : MonoBehaviour
     }
     public void Start()
     {
-        ShowSongs();
+        //ShowSongs();
     }
 
     public void ShowSongs()
@@ -70,7 +70,7 @@ public class MainMenu : MonoBehaviour
 
         StartCoroutine(PreviewSong(Songsettings.CurrentSong.AudioFilePath));
         Debug.Log("LoadSong");
-        LoadSong();
+        //LoadSong();
     }
 
     public IEnumerator PreviewSong(string audioFilePath)
@@ -229,7 +229,7 @@ public class MainMenu : MonoBehaviour
     {
         Debug.LogFormat("SceneHandling is null ? {0}", SceneHandling == null );
         yield return SceneHandling.LoadScene("OpenSaber", LoadSceneMode.Additive);
-        yield return SceneHandling.UnloadScene("Menu");
+        //yield return SceneHandling.UnloadScene("Menu");
     }
 
     public void AreYouSure()
