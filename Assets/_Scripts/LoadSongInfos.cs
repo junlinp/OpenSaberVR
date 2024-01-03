@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-
+using TMPro;
 public class LoadSongInfos : MonoBehaviour
 {
     public List<Song> AllSongs = new List<Song>();
@@ -20,10 +20,10 @@ public class LoadSongInfos : MonoBehaviour
     }
 
     public RawImage Cover;
-    public Text SongName;
-    public Text Artist;
-    public Text BPM;
-    public Text Levels;
+    public TextMeshProUGUI SongName;
+    public TextMeshProUGUI Artist;
+    public TextMeshProUGUI BPM;
+    public TextMeshProUGUI Levels;
     private SongSettings Songsettings;
 
     private void Awake()

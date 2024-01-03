@@ -70,8 +70,8 @@ public class MainMenu : MonoBehaviour
         }
 
         StartCoroutine(PreviewSong(Songsettings.CurrentSong.AudioFilePath));
-        Debug.Log("LoadSong");
-        //LoadSong();
+        
+        
     }
 
     public IEnumerator PreviewSong(string audioFilePath)
