@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainMenu : MonoBehaviour
 {
@@ -178,7 +179,7 @@ public class MainMenu : MonoBehaviour
             {
                 var button = GameObject.Instantiate(LevelButtonTemplate, LevelChooser.transform);
 
-                button.GetComponentInChildren<Text>().text = difficulty;
+                button.GetComponentInChildren<TextMeshProUGUI>().text = difficulty;
                 button.GetComponentInChildren<Button>().onClick.AddListener(() => StartSceneWithDifficulty(difficulty));
                 button.SetActive(true);
                 buttonsCreated.Add(button);
@@ -211,7 +212,7 @@ public class MainMenu : MonoBehaviour
                     break;
                   
             }
-            StartSceneWithDifficulty(song.Difficulties[1]);
+            
         }
         else
         {
