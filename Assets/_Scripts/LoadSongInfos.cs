@@ -36,7 +36,7 @@ public class LoadSongInfos : MonoBehaviour
         AddSong();
     }
     public void AddSong() {
-        string path = Path.Combine(Application.persistentDataPath + "/Playlists");
+        string path = Path.Combine(Application.streamingAssetsPath + "/Playlists");
         if (Directory.Exists(path))
         {
             foreach (var dir in Directory.GetDirectories(path))
