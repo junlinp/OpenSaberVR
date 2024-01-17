@@ -81,7 +81,7 @@ public class SceneHandling : MonoBehaviour
         Application.targetFrameRate = 300;
         if (!IsSceneLoaded("Menu"))
         {
-            StartCoroutine(LoadScene("Menu", LoadSceneMode.Additive));
+            StartCoroutine(LoadScene("Menu", LoadSceneMode.Single));
         }
         //EnsureControllers();
         OnMenuLoaded();

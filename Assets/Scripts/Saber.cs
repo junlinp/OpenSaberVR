@@ -1,5 +1,7 @@
 ﻿using Unity.Mathematics;
 using UnityEngine;
+using System;
+using UnityEngine.Events;
 
 public class Saber : MonoBehaviour
 {
@@ -18,6 +20,10 @@ public class Saber : MonoBehaviour
     public Vector3 TipPrevPos;
     public Vector3 TipDelta;
     public quaternion targetRotation;
+
+
+    public UnityEvent slice_callback;
+
     public void SetSaberVisibility(bool x)
     {
         for (int i = 0; i < SaberMeshes.Length; i++)
@@ -121,5 +127,7 @@ public class Saber : MonoBehaviour
 
         Destroy(hittedObject.gameObject);
         Destroy(go, 2f);
+
+        slice_callback?.Invoke();
     }
 }

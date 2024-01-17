@@ -228,8 +228,9 @@ public class MainMenu : MonoBehaviour
 
     private IEnumerator LoadSongScene()
     {
-        Debug.LogFormat("SceneHandling is null ? {0}", SceneHandling == null );
-        yield return SceneHandling.LoadScene("OpenSaber", LoadSceneMode.Additive);
+        Debug.LogFormat("SceneHandling is null ? {0}", SceneHandling == null);
+        //yield return SceneHandling.LoadScene("OpenSaber", LoadSceneMode.Additive);
+        yield return SceneHandling.LoadScene("PersistentScene", LoadSceneMode.Additive);
         yield return SceneHandling.UnloadScene("Menu");
     }
 

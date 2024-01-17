@@ -11,7 +11,7 @@ public class ButtonClick : MonoBehaviour
     // add action to process press event
     public void Press()
     {
-        //Debug.Log("Press Call");
+        Debug.Log("Press Call");
         var button = GetComponent<Button>();
 
         if (button != null)
