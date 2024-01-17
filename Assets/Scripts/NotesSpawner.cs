@@ -28,15 +28,17 @@ public class NotesSpawner : MonoBehaviour
     private string jsonString;
     private string audioFilePath;
     private List<ColorNote> NotesToSpawn = new List<ColorNote>();
+    private PriorityQueue<double, ColorNote> notes_to_spawn = new PriorityQueue<double, ColorNote>();
     private List<Obstacle> ObstaclesToSpawn = new List<Obstacle>();
     private double BeatsPerMinute;
 
     private double BeatsTime = 0;
     private double? BeatsPreloadTime = 0;
     private double BeatsPreloadTimeTotal = 0;
+    private double current_time_in_seconds = 0;
 
     private readonly double beatAnticipationTime = 1.1;
-    private readonly double beatSpeed = 8.0;
+    private readonly double beatSpeed = 19.0;
     private readonly double beatWarmupTime = BeatsConstants.BEAT_WARMUP_TIME / 1000;
     private readonly double beatWarmupSpeed = BeatsConstants.BEAT_WARMUP_SPEED;
 
@@ -46,6 +48,7 @@ public class NotesSpawner : MonoBehaviour
     private SceneHandling SceneHandling;
     private bool menuLoadInProgress = false;
     private bool audioLoaded = false;
+    private GameState gameState = GameState.ChooseSongs;
 
     void Start()
     {
@@ -61,6 +64,10 @@ public class NotesSpawner : MonoBehaviour
     public void OnEnable() {
         Debug.LogFormat("Songsettings is null {0}",  songSettings== null);
         Debug.LogFormat("Songsettings.CurrentSong is null {0}", songSettings.CurrentSong == null);
+        if (songSettings.CurrentSong == null)
+        {
+            return;
+        }
         string path = songSettings.CurrentSong.Path;
         string version = ""; 
         string difficulty_path = "";
@@ -91,6 +98,7 @@ public class NotesSpawner : MonoBehaviour
 
         audioSource = GetComponent<AudioSource>();
         Debug.LogFormat("Load Path Success {0}", LoadPathSuccess);
+        gameState = GameState.LoadingSongs;
         StartCoroutine("LoadAudio");
 
         JSONObject json = JSONObject.Parse(jsonString);
@@ -136,10 +144,20 @@ public class NotesSpawner : MonoBehaviour
 
         BeatsPerMinute = bpm;
         BeatsPreloadTimeTotal = (beatAnticipationTime + beatWarmupTime);
+        foreach (ColorNote note in NotesToSpawn)
+        {
+            notes_to_spawn.Enqueue(note.TimeInBeat, note);
+            
+        }
     }
 
     private IEnumerator LoadAudio()
     {
+        if (gameState != GameState.LoadingSongs)
+        {
+            Debug.Log("LoadAudio but not in LoadingSongs state");
+            yield return null;
+        }
         var downloadHandler = new DownloadHandlerAudioClip( songSettings.CurrentSong.AudioFilePath, AudioType.OGGVORBIS);
         downloadHandler.compressed = false;
         downloadHandler.streamAudio = true;
@@ -155,14 +173,50 @@ public class NotesSpawner : MonoBehaviour
 
         audioSource.clip = DownloadHandlerAudioClip.GetContent(uwr);
         audioLoaded = true;
+        gameState = GameState.GameReady;
     }
     [ContextMenu("loadmenu")]
     public void LoadBackMenu(){
-StartCoroutine(LoadMenu());
+            StartCoroutine(LoadMenu());
     }
 
     void Update()
     {
+        switch (gameState)
+        {
+            case GameState.GameReady:
+                {
+                    audioSource.Play();
+                    current_time_in_seconds = audioSource.time;
+                    gameState = GameState.GameInPrograss;
+                    break;
+                }
+            case GameState.GameInPrograss:
+                {
+                    current_time_in_seconds += Time.deltaTime;
+                    double beats_need_to_preload = (BeatsConstants.ANTICIPATION_DURATION_SECONDS + BeatsConstants.WARM_UP_DURATION_SECONDS) / 60.0 * BeatsPerMinute;
+                    double current_beats = current_time_in_seconds * (BeatsPerMinute / 60.0);
+
+                    while(!notes_to_spawn.IsEmpty())
+                    {
+                        ColorNote note = notes_to_spawn.Front();
+                        //Debug.LogFormat("Current Beats : {0}, note Beat {1}", current_beats, note.TimeInBeat);
+                        if (note.TimeInBeat <= current_beats + beats_need_to_preload)
+                        {
+                            note = notes_to_spawn.Dequeue();
+                            GenerateNote(note);
+                        } else
+                        {
+                            break;
+                        }
+                    }
+                    
+                    break;
+                }
+            default:
+                break;
+        }
+        /*
         var prevBeatsTime = BeatsTime;
 
         if (BeatsPreloadTime == null)
@@ -183,6 +237,7 @@ StartCoroutine(LoadMenu());
         {
             BeatsTime = BeatsPreloadTime.Value;
         }
+        
 
         double msPerBeat = 1000 * 60 / BeatsPerMinute;
 
@@ -230,6 +285,7 @@ StartCoroutine(LoadMenu());
             // Continue preload.
             BeatsPreloadTime += Time.deltaTime;
         }
+        */
     }
 
     IEnumerator LoadMenu()
@@ -268,7 +324,7 @@ StartCoroutine(LoadMenu());
 
         GameObject cube = Instantiate(Cubes[(int)note.NoteColorType + offset], SpawnPoints[point]);
 
-        cube.transform.localPosition = Vector3.zero;
+        //cube.transform.localPosition = Vector3.zero;
 
         float rotation = 0f;
 
@@ -305,12 +361,22 @@ StartCoroutine(LoadMenu());
                 break;
         }
 
-        cube.transform.Rotate(transform.forward, rotation);
+
 
         var handling = cube.GetComponent<CubeHandling>();
-        handling.AnticipationPosition = (float) (-beatAnticipationTime * beatSpeed - BeatsConstants.SWORD_OFFSET);
+        handling.AnticipationPosition = (BeatsConstants.ANTICIPATION_DURATION_SECONDS * BeatsConstants.ANTICIPATION_SPEED_METER_PER_SECONDS);
         handling.Speed = (float)beatSpeed;
         handling.WarmUpPosition = -beatWarmupTime * beatWarmupSpeed;
+        handling.rotation = rotation;
+        handling.target_x = cube.transform.position.x;
+        handling.target_y = cube.transform.position.y;
+
+        //cube.transform.Rotate(transform.forward, rotation);
+        Vector3 cube_position = cube.transform.position;
+        cube_position.z = BeatsConstants.ANTICIPATION_DURATION_SECONDS * BeatsConstants.ANTICIPATION_SPEED_METER_PER_SECONDS + BeatsConstants.WARM_UP_DURATION_SECONDS * BeatsConstants.WARM_UP_SPEED_METER_PER_SECONDS;
+        cube_position.y = 20.0f;
+        cube_position.x = 0;
+        cube.transform.position = cube_position;
     }
 
     public void GenerateObstacle(Obstacle obstacle)
