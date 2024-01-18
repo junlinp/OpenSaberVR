@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class GameMenuInterface : MonoBehaviour
 {
 
-    public TextMeshProUGUI point_gui;
+    public TextMeshPro point_gui;
     private int current_point = 0;
 
     // Start is called before the first frame update
