@@ -16,7 +16,7 @@ MonoBehaviour:
   m_ConnectionDiscoverySendInterval: 1
   m_ConnectionDiscoveryTimeOutDuration: 5
   m_PackageVersion: 0.7.1
-  m_EnablePolySpatialRuntime: 1
+  m_EnablePolySpatialRuntime: 0
   m_EnableStatistics: 0
   m_ColliderSyncLayerMask:
     serializedVersion: 2

@@ -10,7 +10,7 @@ public class SongFolderText : MonoBehaviour
     
     void Start()
     {
-        string path = Path.Combine(Application.persistentDataPath + "/Playlists");
+        string path = Path.Combine(Application.streamingAssetsPath + "/Playlists");
         bool exists = Directory.Exists(path);
         var list = Directory.GetDirectories(path);
         var lengths = Directory.GetFiles(list[0], "Info.dat").Length;

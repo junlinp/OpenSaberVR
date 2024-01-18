@@ -61,6 +61,25 @@ public class NotesSpawner : MonoBehaviour
         songSettings = SongSettings.Instance;
         SceneHandling = SceneHandling.Instance;
     }
+#if UNITY_ANDROID
+    string ReadTextFromFile(string path)
+    {
+        string fileText = "";
+        UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(path);
+        www.SendWebRequest();
+
+        while (!www.isDone) { }
+        if (www.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
+        {
+            fileText = www.downloadHandler.text;
+        }
+        else
+        {
+            Debug.LogError("Failed to read file: " + path);
+        }
+        return fileText;
+    }
+#endif
     public void OnEnable() {
         Debug.LogFormat("Songsettings is null {0}",  songSettings== null);
         Debug.LogFormat("Songsettings.CurrentSong is null {0}", songSettings.CurrentSong == null);
@@ -68,6 +87,44 @@ public class NotesSpawner : MonoBehaviour
         {
             return;
         }
+#if UNITY_ANDROID
+        string path = songSettings.CurrentSong.Path;
+        string version = "";
+        string difficulty_path = "";
+        bool LoadPathSuccess = false;
+        JSONObject infoFile = JSONObject.Parse(ReadTextFromFile(Path.Combine(path, "Info.dat")));
+        version = infoFile.GetString("_version");
+        var difficultyBeatmapSets = infoFile.GetArray("_difficultyBeatmapSets");
+        foreach (var beatmapSets in difficultyBeatmapSets)
+        {
+            foreach (var difficultyBeatmaps in beatmapSets.Obj.GetArray("_difficultyBeatmaps"))
+            {
+                if (difficultyBeatmaps.Obj.GetString("_difficulty") == songSettings.CurrentSong.SelectedDifficulty)
+                {
+                    audioFilePath = Path.Combine(path, infoFile.GetString("_songFilename"));
+                    difficulty_path = Path.Combine(path, difficultyBeatmaps.Obj.GetString("_beatmapFilename"));
+                    jsonString = ReadTextFromFile(Path.Combine(path, difficultyBeatmaps.Obj.GetString("_beatmapFilename")));
+                    LoadPathSuccess = true;
+                    break;
+                }
+            }
+        }
+        audioSource = GetComponent<AudioSource>();
+        gameState = GameState.LoadingSongs;
+        StartCoroutine("LoadAudio");
+        JSONObject json = JSONObject.Parse(jsonString);
+
+        var bpm = Convert.ToDouble(songSettings.CurrentSong.BPM);
+        NotesToSpawn = Difficulty.ParseJson(difficulty_path);
+        //Notes
+        BeatsPerMinute = bpm;
+        BeatsPreloadTimeTotal = (beatAnticipationTime + beatWarmupTime);
+        foreach (ColorNote note in NotesToSpawn)
+        {
+            notes_to_spawn.Enqueue(note.TimeInBeat, note);
+
+        }
+#else
         string path = songSettings.CurrentSong.Path;
         string version = ""; 
         string difficulty_path = "";
@@ -149,6 +206,7 @@ public class NotesSpawner : MonoBehaviour
             notes_to_spawn.Enqueue(note.TimeInBeat, note);
             
         }
+#endif
     }
 
     private IEnumerator LoadAudio()

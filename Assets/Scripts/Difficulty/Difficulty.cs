@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Boomlagoon.JSON;
 using System.IO;
-
+using UnityEngine;
 namespace dm {
 
 class BpmEvent {
@@ -18,11 +18,34 @@ class RotationEvent {
 }
 
 
-class Difficulty {
+    class Difficulty {
+#if UNITY_ANDROID
+        static string ReadTextFromFile(string path)
+        {
+            string fileText = "";
+            UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(path);
+            www.SendWebRequest();
+
+            while (!www.isDone) { }
+            if (www.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
+            {
+                fileText = www.downloadHandler.text;
+            }
+            else
+            {
+                Debug.LogError("Failed to read file: " + path);
+            }
+            return fileText;
+        }
+#else
+static string ReadTextFromFile(string path) {
+    return File.ReadAllText(path);
+}
+#endif
         static public List<ColorNote> ParseJson(string path)
         {
 
-            JSONObject json = JSONObject.Parse(File.ReadAllText(path));
+            JSONObject json = JSONObject.Parse(ReadTextFromFile(path));
             if (json.ContainsKey("version")) {
             return ParseJsonV3(path);
             }
@@ -35,7 +58,7 @@ class Difficulty {
 
     static private List<ColorNote> ParseJsonV2(string path) {
         List<ColorNote> list= new List<ColorNote>();
-        JSONObject json = JSONObject.Parse( File.ReadAllText(path));
+        JSONObject json = JSONObject.Parse(ReadTextFromFile(path));
         // ColorNotes
         var notes = json.GetArray("_notes");
         foreach (var note in notes)
@@ -56,7 +79,7 @@ class Difficulty {
 
     static private List<ColorNote> ParseJsonV3(string path) {
         List<ColorNote> list = new List<ColorNote>();
-        var jsonString = File.ReadAllText(path);
+        var jsonString = ReadTextFromFile(path);
         JSONObject json = JSONObject.Parse(jsonString);
         // ColorNotes
         var notes = json.GetArray("colorNotes");
