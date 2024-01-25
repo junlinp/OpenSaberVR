@@ -230,7 +230,11 @@ public class MainMenu : MonoBehaviour
     {
         Debug.LogFormat("SceneHandling is null ? {0}", SceneHandling == null);
         //yield return SceneHandling.LoadScene("OpenSaber", LoadSceneMode.Additive);
-        yield return SceneHandling.LoadScene("PersistentScene", LoadSceneMode.Additive);
+        //yield return SceneHandling.LoadScene("PersistentScene", LoadSceneMode.Single);
+        Debug.LogFormat("GameStateMachine In MainMenu hashcode : {0}", GameStateMachine.Instance.GetHashCode());
+        Debug.LogFormat("GameStateMachine In MainMenu GameState {0}", GameStateMachine.Instance.GameState);
+        GameStateMachine.Instance.GameState = GameState.LoadingSongs;
+        Debug.LogFormat("GameStateMachine In MainMenu GameState {0}", GameStateMachine.Instance.GameState);
         yield return SceneHandling.UnloadScene("Menu");
     }
 

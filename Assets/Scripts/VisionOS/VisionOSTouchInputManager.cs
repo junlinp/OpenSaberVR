@@ -1,19 +1,24 @@
+#if UNITY_VISIONOS
 using Unity.PolySpatial.InputDevices;
-using UnityEngine;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
+#endif
+using UnityEngine;
 
 public class VisionOSTouchInputManager : MonoBehaviour
 {
  
     void OnEnable()
     {
+#if UNITY_VISIONOS
         EnhancedTouchSupport.Enable();
+#endif
     }
 
     void Update()
     {
+#if UNITY_VISIONOS
         var activeTouches = Touch.activeTouches;
 
         if (activeTouches.Count > 0)
@@ -32,5 +37,6 @@ public class VisionOSTouchInputManager : MonoBehaviour
                 }
             }
         }
+#endif
     }
 }

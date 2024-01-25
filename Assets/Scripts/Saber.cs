@@ -23,7 +23,7 @@ public class Saber : MonoBehaviour
 
 
     public UnityEvent slice_callback;
-
+    public float length = 1.0f;
     public void SetSaberVisibility(bool x)
     {
         for (int i = 0; i < SaberMeshes.Length; i++)
@@ -66,7 +66,7 @@ public class Saber : MonoBehaviour
     void Update()
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, 1f, layer))
+        if (Physics.Raycast(transform.position, transform.forward, out hit, length, layer))
         {
             if (!string.IsNullOrWhiteSpace(hit.transform.tag) && hit.transform.CompareTag("CubeNonDirection"))
             {

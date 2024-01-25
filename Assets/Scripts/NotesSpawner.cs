@@ -48,19 +48,22 @@ public class NotesSpawner : MonoBehaviour
     private SceneHandling SceneHandling;
     private bool menuLoadInProgress = false;
     private bool audioLoaded = false;
-    private GameState gameState = GameState.ChooseSongs;
+    private GameStateMachine gameStateMachine;
 
     void Start()
     {
          //songSettings= SongSettings.Instance;
         //SceneHandling = SceneHandling.Instance;
+        gameStateMachine = GameStateMachine.Instance;
 
     }
     private void Awake()
     {
         songSettings = SongSettings.Instance;
         SceneHandling = SceneHandling.Instance;
+        gameStateMachine = GameStateMachine.Instance;
     }
+
 #if UNITY_ANDROID
     string ReadTextFromFile(string path)
     {
@@ -80,7 +83,7 @@ public class NotesSpawner : MonoBehaviour
         return fileText;
     }
 #endif
-    public void OnEnable() {
+    public void OnLoadingSong() {
         Debug.LogFormat("Songsettings is null {0}",  songSettings== null);
         Debug.LogFormat("Songsettings.CurrentSong is null {0}", songSettings.CurrentSong == null);
         if (songSettings.CurrentSong == null)
@@ -110,7 +113,7 @@ public class NotesSpawner : MonoBehaviour
             }
         }
         audioSource = GetComponent<AudioSource>();
-        gameState = GameState.LoadingSongs;
+        //gameState = GameState.LoadingSongs;
         StartCoroutine("LoadAudio");
         JSONObject json = JSONObject.Parse(jsonString);
 
@@ -211,7 +214,7 @@ public class NotesSpawner : MonoBehaviour
 
     private IEnumerator LoadAudio()
     {
-        if (gameState != GameState.LoadingSongs)
+        if (gameStateMachine.GameState != GameState.LoadingSongs)
         {
             Debug.Log("LoadAudio but not in LoadingSongs state");
             yield return null;
@@ -231,7 +234,7 @@ public class NotesSpawner : MonoBehaviour
 
         audioSource.clip = DownloadHandlerAudioClip.GetContent(uwr);
         audioLoaded = true;
-        gameState = GameState.GameReady;
+        gameStateMachine.GameState= GameState.GameReady;
     }
     [ContextMenu("loadmenu")]
     public void LoadBackMenu(){
@@ -240,13 +243,18 @@ public class NotesSpawner : MonoBehaviour
 
     void Update()
     {
-        switch (gameState)
+        Debug.LogFormat("GameStateMachine In NotesSpawner hashcode : {0}", GameStateMachine.Instance.GetHashCode());
+        switch (gameStateMachine.GameState)
         {
+            case GameState.LoadingSongs:{
+                OnLoadingSong();
+                break;
+            }
             case GameState.GameReady:
                 {
                     audioSource.Play();
                     current_time_in_seconds = audioSource.time;
-                    gameState = GameState.GameInPrograss;
+                    gameStateMachine.GameState = GameState.GameInPrograss;
                     break;
                 }
             case GameState.GameInPrograss:
