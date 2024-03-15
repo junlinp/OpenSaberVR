@@ -1387,6 +1387,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4779525804788314149, guid: 8bde599f6845f3edc8486f6b19f31946,
         type: 3}
+    - target: {fileID: 8801419627318951568, guid: 59aba35d4aaf74f6e910083f43bfa3d8,
+        type: 3}
+      propertyPath: m_TrackingStateAction.m_Reference
+      value: 
+      objectReference: {fileID: 7488534183739054628, guid: 8bde599f6845f3edc8486f6b19f31946,
+        type: 3}
     - target: {fileID: 8801419627318951570, guid: 59aba35d4aaf74f6e910083f43bfa3d8,
         type: 3}
       propertyPath: m_Enabled
