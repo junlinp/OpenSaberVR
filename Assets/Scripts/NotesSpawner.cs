@@ -18,7 +18,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using dm;
-
+namespace dm { 
 public class NotesSpawner : MonoBehaviour
 {
     public GameObject[] Cubes;
@@ -48,7 +48,6 @@ public class NotesSpawner : MonoBehaviour
     private SceneHandling SceneHandling;
     private bool menuLoadInProgress = false;
     private bool audioLoaded = false;
-    private GameState gameState = GameState.ChooseSongs;
 
     void Start()
     {
@@ -80,13 +79,12 @@ public class NotesSpawner : MonoBehaviour
         return fileText;
     }
 #endif
-    public void OnEnable() {
-        Debug.LogFormat("Songsettings is null {0}",  songSettings== null);
-        Debug.LogFormat("Songsettings.CurrentSong is null {0}", songSettings.CurrentSong == null);
-        if (songSettings.CurrentSong == null)
+        public void LoadingSong()
         {
-            return;
-        }
+            if (songSettings.CurrentSong == null)
+            {
+                return;
+            }
 #if UNITY_ANDROID
         string path = songSettings.CurrentSong.Path;
         string version = "";
@@ -125,228 +123,240 @@ public class NotesSpawner : MonoBehaviour
 
         }
 #else
-        string path = songSettings.CurrentSong.Path;
-        string version = ""; 
-        string difficulty_path = "";
-        bool LoadPathSuccess = false;
-        if (Directory.Exists(path))
-        {
-            if (Directory.GetFiles(path, "Info.dat").Length > 0)
+            string path = songSettings.CurrentSong.Path;
+            string version = "";
+            string difficulty_path = "";
+            bool LoadPathSuccess = false;
+            if (Directory.Exists(path))
             {
-                JSONObject infoFile = JSONObject.Parse(File.ReadAllText(Path.Combine(path, "Info.dat")));
-                version = infoFile.GetString("_version");
-                var difficultyBeatmapSets = infoFile.GetArray("_difficultyBeatmapSets");
-                foreach (var beatmapSets in difficultyBeatmapSets)
+                if (Directory.GetFiles(path, "Info.dat").Length > 0)
                 {
-                    foreach (var difficultyBeatmaps in beatmapSets.Obj.GetArray("_difficultyBeatmaps"))
+                    JSONObject infoFile = JSONObject.Parse(File.ReadAllText(Path.Combine(path, "Info.dat")));
+                    version = infoFile.GetString("_version");
+                    var difficultyBeatmapSets = infoFile.GetArray("_difficultyBeatmapSets");
+                    foreach (var beatmapSets in difficultyBeatmapSets)
                     {
-                        if (difficultyBeatmaps.Obj.GetString("_difficulty") == songSettings.CurrentSong.SelectedDifficulty)
+                        foreach (var difficultyBeatmaps in beatmapSets.Obj.GetArray("_difficultyBeatmaps"))
                         {
-                            audioFilePath = Path.Combine(path, infoFile.GetString("_songFilename"));
-                            difficulty_path = Path.Combine(path, difficultyBeatmaps.Obj.GetString("_beatmapFilename"));
-                            jsonString = File.ReadAllText(Path.Combine(path, difficultyBeatmaps.Obj.GetString("_beatmapFilename")));
-                            LoadPathSuccess = true;
-                            break;
+                            if (difficultyBeatmaps.Obj.GetString("_difficulty") == songSettings.CurrentSong.SelectedDifficulty)
+                            {
+                                audioFilePath = Path.Combine(path, infoFile.GetString("_songFilename"));
+                                difficulty_path = Path.Combine(path, difficultyBeatmaps.Obj.GetString("_beatmapFilename"));
+                                jsonString = File.ReadAllText(Path.Combine(path, difficultyBeatmaps.Obj.GetString("_beatmapFilename")));
+                                LoadPathSuccess = true;
+                                break;
+                            }
                         }
                     }
                 }
             }
-        }
 
-        audioSource = GetComponent<AudioSource>();
-        Debug.LogFormat("Load Path Success {0}", LoadPathSuccess);
-        gameState = GameState.LoadingSongs;
-        StartCoroutine("LoadAudio");
+            audioSource = GetComponent<AudioSource>();
 
-        JSONObject json = JSONObject.Parse(jsonString);
+            JSONObject json = JSONObject.Parse(jsonString);
 
-        var bpm = Convert.ToDouble( songSettings.CurrentSong.BPM);
+            var bpm = Convert.ToDouble(songSettings.CurrentSong.BPM);
 
-        //Notes
-        /*
-        var notes = json.GetArray("_notes");
-        foreach (var note in notes)
-        {
-            var n = new Note
+            //Notes
+            /*
+            var notes = json.GetArray("_notes");
+            foreach (var note in notes)
             {
-                Hand = (NoteType)note.Obj.GetNumber("_type"),
-                CutDirection = (CutDirection)note.Obj.GetNumber("_cutDirection"),
-                LineIndex = (int)note.Obj.GetNumber("_lineIndex"),
-                LineLayer = (int)note.Obj.GetNumber("_lineLayer"),
-                TimeInSeconds = (note.Obj.GetNumber("_time") / bpm) * 60,
-                Time = (note.Obj.GetNumber("_time"))
-            };
+                var n = new Note
+                {
+                    Hand = (NoteType)note.Obj.GetNumber("_type"),
+                    CutDirection = (CutDirection)note.Obj.GetNumber("_cutDirection"),
+                    LineIndex = (int)note.Obj.GetNumber("_lineIndex"),
+                    LineLayer = (int)note.Obj.GetNumber("_lineLayer"),
+                    TimeInSeconds = (note.Obj.GetNumber("_time") / bpm) * 60,
+                    Time = (note.Obj.GetNumber("_time"))
+                };
 
-            NotesToSpawn.Add(n);
-        }
-        */
-        NotesToSpawn = Difficulty.ParseJson(difficulty_path);
-        Debug.LogFormat("Load {0} Notes", NotesToSpawn.Count);
-        //Obstacles
-        //var obstacles = json.GetArray("_obstacles");
-        //foreach (var obstacle in obstacles)
-        //{
-        //    var o = new Obstacle
-        //    {
-        //        Type = (ObstacleType)obstacle.Obj.GetNumber("_type"),
-        //        Duration = obstacle.Obj.GetNumber("_duration"),
-        //        LineIndex = (int)obstacle.Obj.GetNumber("_lineIndex"),
-        //        TimeInSeconds = (obstacle.Obj.GetNumber("_time") / bpm) * 60,
-        //        Time = (obstacle.Obj.GetNumber("_time")),
-        //        Width = (obstacle.Obj.GetNumber("_width"))
-        //    };
+                NotesToSpawn.Add(n);
+            }
+            */
+            NotesToSpawn = Difficulty.ParseJson(difficulty_path);
+            Debug.LogFormat("Load {0} Notes", NotesToSpawn.Count);
+            //Obstacles
+            //var obstacles = json.GetArray("_obstacles");
+            //foreach (var obstacle in obstacles)
+            //{
+            //    var o = new Obstacle
+            //    {
+            //        Type = (ObstacleType)obstacle.Obj.GetNumber("_type"),
+            //        Duration = obstacle.Obj.GetNumber("_duration"),
+            //        LineIndex = (int)obstacle.Obj.GetNumber("_lineIndex"),
+            //        TimeInSeconds = (obstacle.Obj.GetNumber("_time") / bpm) * 60,
+            //        Time = (obstacle.Obj.GetNumber("_time")),
+            //        Width = (obstacle.Obj.GetNumber("_width"))
+            //    };
 
-        //    ObstaclesToSpawn.Add(o);
-        //}
+            //    ObstaclesToSpawn.Add(o);
+            //}
 
-        BeatsPerMinute = bpm;
-        BeatsPreloadTimeTotal = (beatAnticipationTime + beatWarmupTime);
-        foreach (ColorNote note in NotesToSpawn)
-        {
-            notes_to_spawn.Enqueue(note.TimeInBeat, note);
-            
-        }
+            BeatsPerMinute = bpm;
+            BeatsPreloadTimeTotal = (beatAnticipationTime + beatWarmupTime);
+            foreach (ColorNote note in NotesToSpawn)
+            {
+                notes_to_spawn.Enqueue(note.TimeInBeat, note);
+            }
+
+            StartCoroutine("LoadAudio");
 #endif
-    }
-
-    private IEnumerator LoadAudio()
-    {
-        if (gameState != GameState.LoadingSongs)
-        {
-            Debug.Log("LoadAudio but not in LoadingSongs state");
-            yield return null;
         }
-        var downloadHandler = new DownloadHandlerAudioClip( songSettings.CurrentSong.AudioFilePath, AudioType.OGGVORBIS);
-        downloadHandler.compressed = false;
-        downloadHandler.streamAudio = true;
-        var uwr = new UnityWebRequest(
-                 songSettings.CurrentSong.AudioFilePath,
+
+        private IEnumerator LoadAudio()
+        {
+            if (GameMachineState.Instance.State != GameState.LOADING_SONGS)
+            {
+                Debug.Log("LoadAudio but not in LoadingSongs state");
+                yield return null;
+            }
+            var downloadHandler = new DownloadHandlerAudioClip(songSettings.CurrentSong.AudioFilePath, AudioType.OGGVORBIS);
+            downloadHandler.compressed = false;
+            downloadHandler.streamAudio = true;
+            var uwr = new UnityWebRequest(
+                     songSettings.CurrentSong.AudioFilePath,
                 UnityWebRequest.kHttpVerbGET,
                 downloadHandler,
                 null);
 
-        var request = uwr.SendWebRequest();
-        while (!request.isDone)
-            yield return null;
+            var request = uwr.SendWebRequest();
+            while (!request.isDone)
+                yield return null;
 
-        audioSource.clip = DownloadHandlerAudioClip.GetContent(uwr);
-        audioLoaded = true;
-        gameState = GameState.GameReady;
-    }
-    [ContextMenu("loadmenu")]
-    public void LoadBackMenu(){
+            audioSource.clip = DownloadHandlerAudioClip.GetContent(uwr);
+            audioLoaded = true;
+            GameMachineState.Instance.ChangeToGameReady();
+            //gameState = GameState.GameReady;
+        }
+        [ContextMenu("loadmenu")]
+        public void LoadBackMenu()
+        {
             StartCoroutine(LoadMenu());
-    }
+        }
 
-    void Update()
-    {
-        switch (gameState)
+        void Update()
         {
-            case GameState.GameReady:
-                {
-                    audioSource.Play();
-                    current_time_in_seconds = audioSource.time;
-                    gameState = GameState.GameInPrograss;
-                    break;
-                }
-            case GameState.GameInPrograss:
-                {
-                    current_time_in_seconds += Time.deltaTime;
-                    double beats_need_to_preload = (BeatsConstants.ANTICIPATION_DURATION_SECONDS + BeatsConstants.WARM_UP_DURATION_SECONDS) / 60.0 * BeatsPerMinute;
-                    double current_beats = current_time_in_seconds * (BeatsPerMinute / 60.0);
-
-                    while(!notes_to_spawn.IsEmpty())
+            switch (GameMachineState.Instance.State)
+            {
+                case GameState.LOADING_SONGS:
                     {
-                        ColorNote note = notes_to_spawn.Front();
-                        //Debug.LogFormat("Current Beats : {0}, note Beat {1}", current_beats, note.TimeInBeat);
-                        if (note.TimeInBeat <= current_beats + beats_need_to_preload)
-                        {
-                            note = notes_to_spawn.Dequeue();
-                            GenerateNote(note);
-                        } else
-                        {
-                            break;
-                        }
+                        LoadingSong();
+                        break;
                     }
-                    
+
+                case GameState.GAME_READY:
+                    {
+                        audioSource.Play();
+                        current_time_in_seconds = audioSource.time;
+                        //gameState = GameState.GameInPrograss;
+                        GameMachineState.Instance.ChangeToGameInProgress();
+                        break;
+                    }
+                case GameState.GMAE_IN_PROGRESS:
+                    {
+                        current_time_in_seconds += Time.deltaTime;
+                        double beats_need_to_preload = (BeatsConstants.ANTICIPATION_DURATION_SECONDS + BeatsConstants.WARM_UP_DURATION_SECONDS) / 60.0 * BeatsPerMinute;
+                        double current_beats = current_time_in_seconds * (BeatsPerMinute / 60.0);
+
+                        while (!notes_to_spawn.IsEmpty())
+                        {
+                            ColorNote note = notes_to_spawn.Front();
+                            //Debug.LogFormat("Current Beats : {0}, note Beat {1}", current_beats, note.TimeInBeat);
+                            if (note.TimeInBeat <= current_beats + beats_need_to_preload)
+                            {
+                                note = notes_to_spawn.Dequeue();
+                                GenerateNote(note);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+                        if (notes_to_spawn.IsEmpty()) {
+                            GameMachineState.Instance.ChangeToGameFinish();
+			            }
+                        break;
+
+                    }
+                default:
                     break;
-                }
-            default:
-                break;
-        }
-        /*
-        var prevBeatsTime = BeatsTime;
+            }
+            /*
+            var prevBeatsTime = BeatsTime;
 
-        if (BeatsPreloadTime == null)
-        {
-            if (!audioSource.isPlaying)
+            if (BeatsPreloadTime == null)
             {
-                if (!menuLoadInProgress)
+                if (!audioSource.isPlaying)
                 {
-                    menuLoadInProgress = true;
-                    StartCoroutine(LoadMenu());
+                    if (!menuLoadInProgress)
+                    {
+                        menuLoadInProgress = true;
+                        StartCoroutine(LoadMenu());
+                    }
+                    return;
                 }
-                return;
+
+                BeatsTime = (audioSource.time + beatAnticipationTime + beatWarmupTime) * 1000;
             }
-
-            BeatsTime = (audioSource.time + beatAnticipationTime + beatWarmupTime) * 1000;
-        }
-        else
-        {
-            BeatsTime = BeatsPreloadTime.Value;
-        }
-        
-
-        double msPerBeat = 1000 * 60 / BeatsPerMinute;
-
-        // Notes
-        // TODO(junlinp): using a queue to process
-        //
-        for (int i = 0; i < NotesToSpawn.Count; ++i)
-        {
-            var noteTime = NotesToSpawn[i].TimeInBeat * msPerBeat;
-            if (noteTime > prevBeatsTime && noteTime <= BeatsTime)
+            else
             {
-                //
-                // FIXME(junlinp): it's necessary?
-                //NotesToSpawn[i].Time = noteTime;
-                //
-                //
-                GenerateNote(NotesToSpawn[i]);
+                BeatsTime = BeatsPreloadTime.Value;
             }
-        }
 
-        //Obstacles
-        for (int i = 0; i < ObstaclesToSpawn.Count; ++i)
-        {
-            var noteTime = ObstaclesToSpawn[i].Time * msPerBeat;
-            if (noteTime > prevBeatsTime && noteTime <= BeatsTime)
+
+            double msPerBeat = 1000 * 60 / BeatsPerMinute;
+
+            // Notes
+            // TODO(junlinp): using a queue to process
+            //
+            for (int i = 0; i < NotesToSpawn.Count; ++i)
             {
-                ObstaclesToSpawn[i].Time = noteTime;
-                GenerateObstacle(ObstaclesToSpawn[i]);
+                var noteTime = NotesToSpawn[i].TimeInBeat * msPerBeat;
+                if (noteTime > prevBeatsTime && noteTime <= BeatsTime)
+                {
+                    //
+                    // FIXME(junlinp): it's necessary?
+                    //NotesToSpawn[i].Time = noteTime;
+                    //
+                    //
+                    GenerateNote(NotesToSpawn[i]);
+                }
             }
-        }
 
-        if (BeatsPreloadTime == null) { return; }
-
-        if (BeatsPreloadTime.Value >= BeatsPreloadTimeTotal)
-        {
-            if (audioLoaded)
+            //Obstacles
+            for (int i = 0; i < ObstaclesToSpawn.Count; ++i)
             {
-                // Finished preload.
-                BeatsPreloadTime = null;
-                audioSource.Play();
+                var noteTime = ObstaclesToSpawn[i].Time * msPerBeat;
+                if (noteTime > prevBeatsTime && noteTime <= BeatsTime)
+                {
+                    ObstaclesToSpawn[i].Time = noteTime;
+                    GenerateObstacle(ObstaclesToSpawn[i]);
+                }
             }
-        }
-        else
-        {
-            // Continue preload.
-            BeatsPreloadTime += Time.deltaTime;
-        }
-        */
-    }
 
-    IEnumerator LoadMenu()
+            if (BeatsPreloadTime == null) { return; }
+
+            if (BeatsPreloadTime.Value >= BeatsPreloadTimeTotal)
+            {
+                if (audioLoaded)
+                {
+                    // Finished preload.
+                    BeatsPreloadTime = null;
+                    audioSource.Play();
+                }
+            }
+            else
+            {
+                // Continue preload.
+                BeatsPreloadTime += Time.deltaTime;
+            }
+            */
+        }
+
+        IEnumerator LoadMenu()
     {
         yield return new WaitForSeconds(5);
         yield return SceneHandling.LoadScene("Menu", LoadSceneMode.Additive);
@@ -521,4 +531,5 @@ public class NotesSpawner : MonoBehaviour
 }
 
 
+}
 

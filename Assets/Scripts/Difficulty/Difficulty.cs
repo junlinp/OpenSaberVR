@@ -46,8 +46,9 @@ static string ReadTextFromFile(string path) {
         {
 
             JSONObject json = JSONObject.Parse(ReadTextFromFile(path));
-            if (json.ContainsKey("version")) {
-            return ParseJsonV3(path);
+            if (json.ContainsKey("version"))
+            {
+                return ParseJsonV3(path);
             }
             else if (json.ContainsKey("_version"))
             {
@@ -56,49 +57,51 @@ static string ReadTextFromFile(string path) {
             return null;
         }
 
-    static private List<ColorNote> ParseJsonV2(string path) {
-        List<ColorNote> list= new List<ColorNote>();
-        JSONObject json = JSONObject.Parse(ReadTextFromFile(path));
-        // ColorNotes
-        var notes = json.GetArray("_notes");
-        foreach (var note in notes)
+        static private List<ColorNote> ParseJsonV2(string path)
         {
-            var n = new ColorNote
+            List<ColorNote> list= new List<ColorNote>();
+            JSONObject json = JSONObject.Parse(ReadTextFromFile(path));
+            // ColorNotes
+            var notes = json.GetArray("_notes");
+            foreach (var note in notes)
             {
-                NoteColorType = (NoteColorType )note.Obj.GetNumber("_type"),
-                CutDirection = (CutDirection)note.Obj.GetNumber("_cutDirection"),
-                xColumn= (int)note.Obj.GetNumber("_lineIndex"),
-                yLayer= (int)note.Obj.GetNumber("_lineLayer"),
-                TimeInBeat = (note.Obj.GetNumber("_time"))
-            };
+                var n = new ColorNote
+                {
+                    NoteColorType = (NoteColorType )note.Obj.GetNumber("_type"),
+                    CutDirection = (CutDirection)note.Obj.GetNumber("_cutDirection"),
+                    xColumn = (int)note.Obj.GetNumber("_lineIndex"),
+                    yLayer = (int)note.Obj.GetNumber("_lineLayer"),
+                    TimeInBeat = (note.Obj.GetNumber("_time"))
+                };
 
-            list.Add(n);
+                list.Add(n);
+            }
+            return list;
         }
-        return list;
-    }
 
-    static private List<ColorNote> ParseJsonV3(string path) {
-        List<ColorNote> list = new List<ColorNote>();
-        var jsonString = ReadTextFromFile(path);
-        JSONObject json = JSONObject.Parse(jsonString);
-        // ColorNotes
-        var notes = json.GetArray("colorNotes");
-        foreach (var note in notes)
+        static private List<ColorNote> ParseJsonV3(string path)
         {
-            var n = new ColorNote
+            List<ColorNote> list = new List<ColorNote>();
+            var jsonString = ReadTextFromFile(path);
+            JSONObject json = JSONObject.Parse(jsonString);
+            // ColorNotes
+            var notes = json.GetArray("colorNotes");
+            foreach (var note in notes)
             {
-                TimeInBeat = note.Obj.GetNumber("b"),
-                xColumn = (int)note.Obj.GetNumber("x"),
-                yLayer = (int)note.Obj.GetNumber("y"),
-                NoteColorType = (NoteColorType)note.Obj.GetNumber("c"),
-                CutDirection = (CutDirection)note.Obj.GetNumber("d"),
-            };
-
-            list.Add(n);
+                Debug.LogFormat("Note : {0}", note);
+                var n = new ColorNote
+                {
+                    TimeInBeat = note.Obj.GetNumber("b"),
+                    xColumn = (int)note.Obj.GetNumber("x"),
+                    yLayer = (int)note.Obj.GetNumber("y"),
+                    NoteColorType = (NoteColorType)note.Obj.GetNumber("c"),
+                    CutDirection = (CutDirection)note.Obj.GetNumber("d"),
+                };
+                list.Add(n);
+            }
+            return list;
         }
-        return list;
     }
-}
 
 
 }
