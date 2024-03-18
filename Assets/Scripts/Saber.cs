@@ -6,6 +6,9 @@ using UnityEngine.Events;
 public class Saber : MonoBehaviour
 {
     public LayerMask layer;
+
+    private Quaternion previous_quaternion;
+
     private Vector3 previousPos;
     private Vector3 posDelta;
     private Slice slicer;
@@ -21,6 +24,7 @@ public class Saber : MonoBehaviour
     public Vector3 TipDelta;
     public quaternion targetRotation;
 
+    public float ray_length = 5.0f;
 
     public UnityEvent slice_callback;
 
@@ -65,28 +69,53 @@ public class Saber : MonoBehaviour
 
     void Update()
     {
+        // prue rotation can't SliceObject....
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, 1f, layer))
+        if (Physics.Raycast(transform.position, transform.forward, out hit, ray_length, layer))
         {
+            Debug.LogFormat("{0} Hit", layer.ToString());
+            Quaternion delta_rotation = Quaternion.Inverse(previous_quaternion) * transform.rotation;
+            float rad = 0.0f;
+            Vector3 delta_angle_axis = Vector3.zero;
+	        delta_rotation.ToAngleAxis(out rad, out delta_angle_axis);
+
+            double rad_threshold = 30.0 / 180.0 * Math.PI;
             if (!string.IsNullOrWhiteSpace(hit.transform.tag) && hit.transform.CompareTag("CubeNonDirection"))
             {
-                if (Vector3.Angle(transform.position - previousPos, hit.transform.up) > 130 ||
-                    Vector3.Angle(transform.position - previousPos, hit.transform.right) > 130 ||
-                    Vector3.Angle(transform.position - previousPos, -hit.transform.up) > 130 ||
-                    Vector3.Angle(transform.position - previousPos, -hit.transform.right) > 130)
-                {
+
+                //if (Vector3.Angle(transform.position - previousPos, hit.transform.up) > 130 ||
+                //    Vector3.Angle(transform.position - previousPos, hit.transform.right) > 130 ||
+                //    Vector3.Angle(transform.position - previousPos, -hit.transform.up) > 130 ||
+                //    Vector3.Angle(transform.position - previousPos, -hit.transform.right) > 130)
+                //{
+                //    SliceObject(hit.transform);
+                //}
+
+                Vector3 z_axis_forward = hit.transform.forward;
+                double dot_value = Vector3.Dot(z_axis_forward, delta_angle_axis);
+                Debug.LogFormat("Delta AngleAxis : {0}, Angle : {1}, Dot:{2}, z_axis_forward:{3}", delta_angle_axis, rad, dot_value, z_axis_forward);
+                if ( Math.Abs(dot_value) < 0.2 && rad > rad_threshold) {
                     SliceObject(hit.transform);
-                }
+		        }
             }
             else
             {
-                if (Vector3.Angle(transform.position - previousPos, hit.transform.up) > 130)
-                {
+                // y-axis up
+                Vector3 negetive_x_axis = hit.transform.right;
+                double dot_value = Vector3.Dot(negetive_x_axis, delta_angle_axis); 
+                //Debug.LogFormat("Delta AngleAxis : {0}, Angle : {1}, Dot:{2}, y_axis_up:{3}", delta_angle_axis, rad, dot_value, negetive_x_axis);
+                if (dot_value > 1.0 / Math.Sqrt(2) && rad > rad_threshold) { 
                     SliceObject(hit.transform);
                 }
+                //if (Vector3.Angle(transform.position - previousPos, hit.transform.up) > 130)
+                //{
+                //    SliceObject(hit.transform);
+                //}
             }
         }
         previousPos = transform.position;
+        previous_quaternion = transform.rotation;
+
     }
 
     public void LateUpdate(){

@@ -49,6 +49,7 @@ public class SceneHandling : MonoBehaviour
         LeftController = GameObject.FindWithTag("LeftController");
         RightController = GameObject.FindWithTag("RightController");
     }
+
     void OnMenuLoaded()
     {
         EnsureControllers();
@@ -62,6 +63,7 @@ public class SceneHandling : MonoBehaviour
         RightController.GetComponent<LineRenderer>().enabled = true;
         RightController.GetComponent<XRInteractorLineVisual>().enabled = true;
     }
+
     void OnSaberLoaded()
     {
         EnsureControllers();
