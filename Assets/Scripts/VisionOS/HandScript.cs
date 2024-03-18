@@ -210,8 +210,8 @@ public class HandScript : MonoBehaviour
             // { t:[   0.01005 - 0.0513511  0.0743921], q:[-0.065242  0.271152 - 0.943005 - 0.639705] }
             //
             double theta = -110.0 / 180.0 * 3.1415926;
-            Quaternion T_hand_imu_rotation = new Quaternion(0.0f, 0.0f, (float)Math.Sin(theta / 2.0), (float)Math.Cos(theta / 2.0));
-            Vector3 T_hand_imu_position = new Vector3(0.015f, -0.03f, 0.11f);
+            rotation = new Quaternion(0.0f, 0.0f, (float)Math.Sin(theta / 2.0), (float)Math.Cos(theta / 2.0));
+            position = new Vector3(0.015f, -0.03f, 0.11f);
         }
         if (hand_type == 1) { 
             // TODO:(junlinp) Need To check
