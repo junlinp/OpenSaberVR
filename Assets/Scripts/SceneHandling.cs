@@ -8,38 +8,46 @@ public class SceneHandling : MonoBehaviour
     GameObject LeftController;
     GameObject RightController;
 
-    GameObject LeftSaber;
-    GameObject LeftShaft;
-    GameObject LeftModel;
+    private GameObject LeftSaber;
+    private GameObject LeftShaft;
+    private GameObject LeftModel;
 
-    GameObject RightSaber;
-    GameObject RightShaft;
-    GameObject RightModel;
+    private GameObject RightSaber;
+    private GameObject RightShaft;
+    private GameObject RightModel;
 
-   
+
     public static SceneHandling instance_;
 
-    public static SceneHandling Instance {
-        get {
+    public static SceneHandling Instance
+    {
+        get
+        {
             if (instance_ == null)
             {
                 // If the instance is null, find it in the scene or create a new GameObject
-                instance_ = FindObjectOfType<SceneHandling >();
+                instance_ = FindObjectOfType<SceneHandling>();
 
                 if (instance_ == null)
                 {
                     // If still null, create a new GameObject and attach the singleton script
                     GameObject singletonObject = new GameObject("SceneHandling ");
-                    instance_ = singletonObject.AddComponent<SceneHandling >();
+                    instance_ = singletonObject.AddComponent<SceneHandling>();
                 }
             }
-            return instance_;}
-        private set{ instance_ = value;}
-         }
-    private void Awake() {
-        if (Instance != null && Instance != this) {
+            return instance_;
+        }
+        private set { instance_ = value; }
+    }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
             Destroy(this);
-        } else {
+        }
+        else
+        {
             Instance = this;
         }
     }
