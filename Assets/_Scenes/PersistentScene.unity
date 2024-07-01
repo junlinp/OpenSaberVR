@@ -7403,7 +7403,6 @@ GameObject:
   - component: {fileID: 2104965454}
   - component: {fileID: 2104965455}
   - component: {fileID: 2104965453}
-  - component: {fileID: 2104965456}
   - component: {fileID: 2104965457}
   m_Layer: 0
   m_Name: DMVisionOSManager
@@ -7451,29 +7450,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6d77f59233684a2a89be9583a4979fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2104965456
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104965452}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03e43b8b581414879bdd3bd6f61ee112, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  accumulated_left_time_ms: 0
-  accumulated_right_time_ms: 0
-  update_gesture_per_ms: 10000
-  SetLeftHandPose: {fileID: 0}
-  SetLeftConvertHandPose: {fileID: 0}
-  SetRightHandPose: {fileID: 0}
-  SetRightConvertHandPose: {fileID: 0}
-  Left_T_imu_in_hand_rotation: {x: 0, y: 0, z: 0, w: 1}
-  Right_T_imu_in_hand_rotation: {x: 0, y: 0, z: 0, w: 1}
-  Left_T_imu_in_hand_position: {x: 0, y: 0, z: 0}
-  Right_T_imu_in_hand_position: {x: 0, y: 0, z: 0}
 --- !u!114 &2104965457
 MonoBehaviour:
   m_ObjectHideFlags: 0
